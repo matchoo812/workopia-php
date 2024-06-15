@@ -1,3 +1,3 @@
 <?php
 
-echo 'Whoopsiedaisy!';
+loadView('/error/404');
