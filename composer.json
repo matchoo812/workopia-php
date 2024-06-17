@@ -1,0 +1,16 @@
+{
+  "name": "matchoo812/workopia-php",
+  "description": "A PHP-based job listing application",
+  "authors": [
+    {
+      "name": "Matt Ballard",
+      "email": "mattjballard81@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Framework\\": "Framework/",
+      "App\\": "App/"
+    }
+  }
+}
