@@ -80,19 +80,47 @@ class Router
    * @param string $method
    * @return void 
    */
-  public function route($uri, $method)
+  public function route($uri)
   {
+    $requestMethod = $_SERVER['REQUEST_METHOD'];
     foreach ($this->routes as $route) {
-      if ($route['uri'] === $uri && $route['method'] === $method) {
-        // extract controller and controller method
-        $controller = 'App\\Controllers\\' . $route['controller'];
-        $controllerMethod = $route['controllerMethod'];
+      // split current uri
+      $uriSegments = explode('/', trim($uri, '/'));
+      // split route uri into segments
+      $routeSegments = explode('/', trim($route['uri'], '/'));
 
-        // instantiate controller and call method
-        $controllerInstance = new $controller();
-        $controllerInstance->$controllerMethod();
+      $match = true;
 
-        return;
+      // check if number of segments matches
+      if (count($uriSegments) === count($routeSegments) && strtoupper($route['method'] === $requestMethod)) {
+        $params = [];
+
+        $match = true;
+
+        for ($i = 0; $i < count($uriSegments); $i++) {
+          // check if uri's don't match and there are no params
+          if ($routeSegments[$i] !== $uriSegments[$i] && !preg_match('/\{(.+?)\}/', $routeSegments[$i])) {
+            $match = false;
+            break;
+          }
+
+          // check for param and add to $params array
+          if (preg_match('/\{(.+?)\}/', $routeSegments[$i], $matches)) {
+            // set key-value pair using matches value (from routes) and uri segment (value passed in from url)
+            $params[$matches[1]] = $uriSegments[$i];
+            // inspectAndDie($params);
+          }
+        }
+
+        if ($match) {
+          $controller = 'App\\Controllers\\' . $route['controller'];
+          $controllerMethod = $route['controllerMethod'];
+
+          // instantiate controller and call method
+          $controllerInstance = new $controller();
+          $controllerInstance->$controllerMethod($params);
+          return;
+        }
       }
     }
 
