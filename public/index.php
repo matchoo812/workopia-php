@@ -1,7 +1,13 @@
 <?php
 require '../helpers.php';
-require basePath('Database.php');
-require basePath('Router.php');
+
+// automatically load framework classes
+spl_autoload_register(function ($class) {
+  $path = basePath('Framework/' . $class . '.php');
+  if (file_exists($path)) {
+    require $path;
+  }
+});
 
 // Instantiate router before routes variable so it can be accessed from routes file
 $router = new Router();
