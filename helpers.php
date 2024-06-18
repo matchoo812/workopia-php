@@ -94,3 +94,15 @@ function sanitize($value)
 {
   return filter_var(trim($value), FILTER_SANITIZE_SPECIAL_CHARS);
 }
+
+/**
+ * Redirect to a provided url
+ * 
+ * @param string $url
+ * @return void 
+ */
+function redirect($url)
+{
+  header("Location: {$url}");
+  exit;
+}
