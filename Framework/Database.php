@@ -27,8 +27,8 @@ class Database
 
     try {
       $this->conn = new PDO($dsn, $config['username'], $config['password'], $options);
-    } catch (PDOException $e) {
-      throw new Exception("Database connection failed: {$e->getMessage()}");
+    } catch (\PDOException $e) {
+      throw new \Exception("Database connection failed: {$e->getMessage()}");
     }
   }
 
@@ -52,8 +52,8 @@ class Database
 
       $sth->execute();
       return $sth;
-    } catch (PDOException $e) {
-      throw new Exception("Query failed to execute: {$e->getMessage()}");
+    } catch (\PDOException $e) {
+      throw new \Exception("Query failed to execute: {$e->getMessage()}");
     }
   }
 }
