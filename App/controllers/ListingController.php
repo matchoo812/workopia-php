@@ -48,4 +48,45 @@ class ListingController
       'listing' => $listing
     ]);
   }
+
+  /**
+   * Store data in database
+   * 
+   * @return void
+   */
+  public function store()
+  {
+    // restrict field names that can be submitted
+    $allowedFields = ['title', 'description', 'salary', 'tags', 'company', 'email', 'address', 'city', 'state', 'phone', 'requirements', 'benefits'];
+
+    // check if keys of $_POST array match flipped values from allowed fields array and return only the keys that match
+    $newListingData = array_intersect_key($_POST, array_flip($allowedFields));
+
+    $newListingData['user_id'] = 1;
+
+    $newListingData = array_map('sanitize', $newListingData);
+
+    $requiredFields = ['title', 'description', 'email', 'city', 'state'];
+    $errors = [];
+
+    foreach ($requiredFields as $field) {
+      if (empty($newListingData[$field]) || !Validation::string($newListingData[$field])) {
+        $errors[$field] = ucfirst($field) . ' is required.';
+      }
+    }
+
+    if (!empty($errors)) {
+      // prevent form submission and reload view with errors
+      loadView(
+        'listings/create',
+        [
+          'errors' => $errors,
+          'listing' => $newListingData
+        ]
+      );
+    } else {
+      // submit data
+      echo 'Success!';
+    }
+  }
 }
