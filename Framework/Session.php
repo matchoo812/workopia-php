@@ -61,7 +61,7 @@ class Session
   public static function clear($key)
   {
     if (isset($_SESSION[$key])) {
-      unset($SESSION[$key]);
+      unset($_SESSION[$key]);
     }
   }
 
@@ -74,5 +74,31 @@ class Session
   {
     session_unset();
     session_destroy();
+  }
+
+  /**
+   * Set session flash message
+   * 
+   * @param string $key
+   * @param string $message
+   * @return void 
+   */
+  public static function setFlashMessage($key, $message)
+  {
+    self::set($key, $message);
+  }
+
+  /**
+   * Get and unset flash message
+   * 
+   * @param string $key
+   * @param mixed $default
+   * @return string 
+   */
+  public static function getFlashMessage($key, $default = null)
+  {
+    $message = self::get($key, $default);
+    self::clear($key);
+    return $message;
   }
 }
