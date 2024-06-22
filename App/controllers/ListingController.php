@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use Framework\Database;
 use Framework\Validation;
+use Framework\Session;
+use Framework\Authorization;
 
 class ListingController
 {
@@ -21,7 +23,7 @@ class ListingController
    */
   public function index()
   {
-    $listings = $this->db->query('SELECT * FROM listings')->fetchAll();
+    $listings = $this->db->query('SELECT * FROM listings ORDER BY created_at DESC')->fetchAll();
 
     loadView('listings/index', [
       'listings' => $listings
@@ -74,10 +76,10 @@ class ListingController
     // restrict field names that can be submitted
     $allowedFields = ['title', 'description', 'salary', 'tags', 'company', 'email', 'address', 'city', 'state', 'phone', 'requirements', 'benefits'];
 
-    // check if keys of $_POST array match flipped values from allowed fields array and return only the keys that match
+    // return only keys that match both keys from $_POST array and values from allowed fields array
     $newListingData = array_intersect_key($_POST, array_flip($allowedFields));
 
-    $newListingData['user_id'] = 1;
+    $newListingData['user_id'] = Session::get('user')['id'];
 
     $newListingData = array_map('sanitize', $newListingData);
 
@@ -144,6 +146,12 @@ class ListingController
     if (!$listing) {
       ErrorController::notFound('Listing not found.');
       return;
+    }
+
+    // Check authorization
+    if (!Authorization::isOwner($listing->user_id)) {
+      $_SESSION['error_message'] = 'You are not authorized to delete this listing.';
+      return redirect('/listings/' . $listing->id);
     }
 
     $this->db->query('DELETE FROM listings WHERE id = :id', $params);
